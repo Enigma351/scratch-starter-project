@@ -5,10 +5,13 @@ module.exports = {
   entry: {
     app: "./src/index.js",
   },
+
   output: {
-    // filename: "app.js",
+    filename: "app.js",
     path: path.resolve(__dirname, "public"),
+    publicPath: "/",
   },
+
   module: {
     rules: [
       {
@@ -20,19 +23,15 @@ module.exports = {
             loader: "postcss-loader",
             options: {
               postcssOptions: {
-                plugins: [
-                  [
-                    "postcss-preset-env",
-                    {
-                      // Options
-                    },
-                  ],
-                ],
+                plugins: {
+                  "@tailwindcss/postcss": {},   // <-- Tailwind v4 plugin
+                },
               },
             },
           },
         ],
       },
+
       {
         test: /\.m?js$/,
         exclude: /(node_modules|bower_components)/,
@@ -45,5 +44,14 @@ module.exports = {
       },
     ],
   },
-  plugins: [new MiniCssExtractPlugin()],
+
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: "app.css",
+    }),
+  ],
+
+  resolve: {
+    extensions: [".js", ".jsx"],
+  },
 };
