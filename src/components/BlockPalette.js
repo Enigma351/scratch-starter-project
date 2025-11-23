@@ -1,12 +1,23 @@
-import React from 'react';
-import { BLOCK_TEMPLATES } from '../utils/blockTemplates';
-
-//BlockPalette
+import React from "react";
+import { BLOCK_TEMPLATES } from "../utils/blockTemplates";
 
 export default function BlockPalette({ onDragStart }) {
   return (
-    <aside className="w-80 bg-slate-900/90 border-r border-slate-700 p-4 overflow-y-auto">
+    <aside
+      className="
+        w-full 
+        md:w-80 
+        bg-slate-900/90 
+        border-r 
+        border-slate-700 
+        p-4 
+        overflow-y-auto
+        max-h-[40vh] 
+        md:max-h-none
+      "
+    >
       <div className="space-y-6">
+        
         {/* Motion Section */}
         <div>
           <h3 className="text-cyan-300 font-semibold mb-3 text-sm uppercase tracking-wide flex items-center gap-2">
@@ -32,10 +43,10 @@ export default function BlockPalette({ onDragStart }) {
                     </span>
 
                     <span className="ml-auto text-xs text-slate-300">
-                      {template.type === 'move' && 'steps?'}
-                      {template.type === 'turn' && 'degree?'}
-                      {template.type === 'goto' && 'x->, y-> '}
-                      {template.type === 'repeat' && 'times?'}
+                      {template.type === "move" && "steps?"}
+                      {template.type === "turn" && "degree?"}
+                      {template.type === "goto" && "x->, y->"}
+                      {template.type === "repeat" && "times?"}
                     </span>
                   </div>
                 </div>
@@ -77,6 +88,7 @@ export default function BlockPalette({ onDragStart }) {
             })}
           </div>
         </div>
+
       </div>
     </aside>
   );

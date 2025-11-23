@@ -1,8 +1,6 @@
 import React from "react";
 import { Trash2 } from "lucide-react";
 
-// ActionPanel
-
 export default function ActionPanel({
   sprite,
   blocks,
@@ -12,7 +10,8 @@ export default function ActionPanel({
 }) {
   return (
     <aside
-      className="w-96 bg-slate-900/70 backdrop-blur border-l border-slate-700 p-4 overflow-y-auto"
+      className="w-full md:w-80 lg:w-96 bg-slate-900/70 backdrop-blur border-l border-slate-700 p-4 
+                 overflow-y-auto max-h-[40vh] md:max-h-none"
       onDragOver={(e) => e.preventDefault()}
       onDrop={onDrop}
     >
@@ -23,15 +22,15 @@ export default function ActionPanel({
         </h3>
 
         <p className="text-slate-500 text-xs mt-1">
-          {blocks.length} block{blocks.length !== 1 ? "s" : ""} configured
+          {blocks.length} block{blocks.length !== 1 ? "s" : ""}
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-4 pb-10">
         {blocks.map((block) => (
           <div
             key={block.id}
-            className="bg-slate-800 p-4 rounded-lg border border-slate-700"
+            className="bg-slate-800 p-4 rounded-lg border border-slate-700 w-full"
           >
             <div className="flex items-center justify-between mb-3">
               <span className="text-slate-200 text-sm font-medium capitalize flex items-center gap-2">
@@ -53,7 +52,6 @@ export default function ActionPanel({
               </button>
             </div>
 
-            {/* Move */}
             {block.type === "move" && (
               <div className="space-y-1">
                 <label className="text-slate-400 text-xs">Steps</label>
@@ -63,12 +61,11 @@ export default function ActionPanel({
                   onChange={(e) =>
                     onUpdateBlock(block.id, "value", Number(e.target.value))
                   }
-                  className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm focus:border-blue-500 outline-none"
+                  className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm outline-none"
                 />
               </div>
             )}
 
-            {/* Turn */}
             {block.type === "turn" && (
               <div className="space-y-1">
                 <label className="text-slate-400 text-xs">Degrees</label>
@@ -78,14 +75,13 @@ export default function ActionPanel({
                   onChange={(e) =>
                     onUpdateBlock(block.id, "value", Number(e.target.value))
                   }
-                  className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm focus:border-blue-500 outline-none"
+                  className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm outline-none"
                 />
               </div>
             )}
 
-            {/* Goto */}
             {block.type === "goto" && (
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <div className="flex-1 space-y-1">
                   <label className="text-slate-400 text-xs">X</label>
                   <input
@@ -94,7 +90,7 @@ export default function ActionPanel({
                     onChange={(e) =>
                       onUpdateBlock(block.id, "x", Number(e.target.value))
                     }
-                    className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm focus:border-blue-500 outline-none"
+                    className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm outline-none"
                   />
                 </div>
 
@@ -106,13 +102,12 @@ export default function ActionPanel({
                     onChange={(e) =>
                       onUpdateBlock(block.id, "y", Number(e.target.value))
                     }
-                    className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm focus:border-blue-500 outline-none"
+                    className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm outline-none"
                   />
                 </div>
               </div>
             )}
 
-            {/* Repeat */}
             {block.type === "repeat" && (
               <div className="space-y-1">
                 <label className="text-slate-400 text-xs">Times</label>
@@ -122,12 +117,11 @@ export default function ActionPanel({
                   onChange={(e) =>
                     onUpdateBlock(block.id, "value", Number(e.target.value))
                   }
-                  className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm focus:border-blue-500 outline-none"
+                  className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm outline-none"
                 />
               </div>
             )}
 
-            {/* Say & Think */}
             {(block.type === "say" || block.type === "think") && (
               <div className="space-y-3">
                 <div className="space-y-1">
@@ -138,7 +132,7 @@ export default function ActionPanel({
                     onChange={(e) =>
                       onUpdateBlock(block.id, "text", e.target.value)
                     }
-                    className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm focus:border-blue-500 outline-none"
+                    className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm outline-none"
                   />
                 </div>
 
@@ -150,7 +144,7 @@ export default function ActionPanel({
                     onChange={(e) =>
                       onUpdateBlock(block.id, "duration", Number(e.target.value))
                     }
-                    className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm focus:border-blue-500 outline-none"
+                    className="w-full bg-slate-900 text-white px-3 py-2 rounded border border-slate-700 text-sm outline-none"
                   />
                 </div>
               </div>
@@ -159,7 +153,7 @@ export default function ActionPanel({
         ))}
 
         {blocks.length === 0 && (
-          <div className="text-center py-12 border-2 border-dashed border-slate-700 rounded-lg bg-slate-800/40">
+          <div className="text-center py-10 border border-dashed border-slate-700 rounded-lg bg-slate-800/40">
             <p className="text-slate-400 text-sm font-medium">Drop blocks here</p>
             <p className="text-slate-500 text-xs mt-1">Start building actions</p>
           </div>

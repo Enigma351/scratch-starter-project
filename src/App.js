@@ -1,38 +1,38 @@
-import React, { useState, useRef } from "react";
-import Header from "./components/Header";
-import BlockPalette from "./components/BlockPalette";
-import Canvas from "./components/Canvas";
-import ActionPanel from "./components/ActionPanel";
-import SpriteList from "./components/SpriteList";
-import { SPRITE_COLORS } from "./utils/constants";
-import { findCollisionPairs } from "./utils/collisions";
+import React, { useState, useRef } from 'react';
+import Header from './components/Header';
+import BlockPalette from './components/BlockPalette';
+import Canvas from './components/Canvas';
+import ActionPanel from './components/ActionPanel';
+import SpriteList from './components/SpriteList';
+import { SPRITE_COLORS } from './utils/constants';
+import { findCollisionPairs } from './utils/collisions';
 
 export default function App() {
   const [sprites, setSprites] = useState([
     {
-      id: "1",
-      name: "Cat",
-      position: { x: 120, y: 180 }, // left
+      id: '1',
+      name: 'Player 1',
+      position: { x: 120, y: 180 },
       rotation: 0,
-      message: "",
+      message: '',
       messageTimeout: null,
       color: SPRITE_COLORS[0],
       scale: 1,
     },
     {
-      id: "2",
-      name: "Dog",
-      position: { x: 420, y: 180 }, // right, same horizontal line
+      id: '2',
+      name: 'Player 2',
+      position: { x: 420, y: 180 },
       rotation: 0,
-      message: "",
+      message: '',
       messageTimeout: null,
       color: SPRITE_COLORS[1],
       scale: 1,
     },
   ]);
 
-  const [selectedSprite, setSelectedSprite] = useState("1");
-  const [actionBlocks, setActionBlocks] = useState({ "1": [], "2": [] });
+  const [selectedSprite, setSelectedSprite] = useState('1');
+  const [actionBlocks, setActionBlocks] = useState({ 1: [], 2: [] });
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [draggedBlock, setDraggedBlock] = useState(null);
@@ -43,9 +43,9 @@ export default function App() {
     const newSprite = {
       id: newId,
       name: `Sprite ${sprites.length + 1}`,
-      position: { x: 150, y: 180 }, 
+      position: { x: 150, y: 180 },
       rotation: 0,
-      message: "",
+      message: '',
       messageTimeout: null,
       color: SPRITE_COLORS[sprites.length % SPRITE_COLORS.length],
       scale: 1,
@@ -82,8 +82,6 @@ export default function App() {
     setActionBlocks((p) => ({ ...p, [newId]: [...(p[id] || [])] }));
   };
 
-  // Block helpers
- 
   const createBlock = (t) => ({
     id: Date.now().toString() + Math.random(),
     type: t.type,
@@ -96,7 +94,7 @@ export default function App() {
 
   const handleDragStart = (e, template) => {
     setDraggedBlock(createBlock(template));
-    e.dataTransfer.effectAllowed = "copy";
+    e.dataTransfer.effectAllowed = 'copy';
   };
 
   const handleDrop = () => {
@@ -124,8 +122,6 @@ export default function App() {
     }));
   };
 
-  // Swap logic (Option B)
- 
   const makePairKey = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
 
   const fullSwapAnimations = (idA, idB) => {
@@ -152,57 +148,48 @@ export default function App() {
     run.swappedPairs.add(makePairKey(idA, idB));
   };
 
-  //helpers
- 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+  const getSpritesSnapshot = () => sprites.map((s) => ({ ...s }));
+
   const stepMove = async (spriteId, totalDistance) => {
-    const step = 6; 
+    const step = 6;
     const steps = Math.max(1, Math.ceil(Math.abs(totalDistance) / step));
-    const perStepDistance = totalDistance / steps;
+    const perStep = totalDistance / steps;
 
     for (let i = 0; i < steps; i++) {
       setSprites((prev) => {
-        const list = prev.map((s) => ({ ...s })); // shallow copy of sprites
+        const list = prev.map((s) => ({ ...s }));
         const sp = list.find((x) => x.id === spriteId);
         if (!sp) return prev;
         const rad = (sp.rotation * Math.PI) / 180;
-        sp.position.x += Math.cos(rad) * perStepDistance;
-        sp.position.y += Math.sin(rad) * perStepDistance;
+        sp.position.x += Math.cos(rad) * perStep;
+        sp.position.y += Math.sin(rad) * perStep;
         return list;
       });
 
       await sleep(60);
 
-      const curr = executionState.current;
-      const currentSprites = getSpritesSnapshot();
-      const hits = findCollisionPairs(currentSprites);
-
+      const curr = getSpritesSnapshot();
+      const hits = findCollisionPairs(curr);
       if (hits.length > 0) {
         for (let [i, j] of hits) {
-          const a = currentSprites[i].id;
-          const b = currentSprites[j].id;
-          if (a === spriteId || b === spriteId) {
-            const key = makePairKey(a, b);
-            curr.swappedPairs = curr.swappedPairs || new Set();
-            if (!curr.swappedPairs.has(key)) {
-              fullSwapAnimations(a, b);
-            }
-            return;
+          const a = curr[i].id;
+          const b = curr[j].id;
+          const key = makePairKey(a, b);
+
+          executionState.current.swappedPairs =
+            executionState.current.swappedPairs || new Set();
+
+          if (!executionState.current.swappedPairs.has(key)) {
+            fullSwapAnimations(a, b);
           }
+          return;
         }
       }
     }
   };
 
-  
-  const getSpritesSnapshot = () => {
-    return sprites.map((s) => ({ ...s }));
-  };
-
- 
-  // Main execution
- 
   const executeActions = async () => {
     if (isPlaying) return;
     setIsPlaying(true);
@@ -217,10 +204,11 @@ export default function App() {
         repeatStack: [],
       };
     });
+
     run.swappedPairs = new Set();
 
-    const runners = sprites.map((s) => runSpriteLoop(s.id));
-    await Promise.all(runners);
+    const all = sprites.map((s) => runSpriteLoop(s.id));
+    await Promise.all(all);
 
     setIsPlaying(false);
   };
@@ -231,13 +219,12 @@ export default function App() {
 
     while (state.blockIndex < state.blocks.length) {
       const block = state.blocks[state.blockIndex];
-
       if (!block) {
         state.blockIndex++;
         continue;
       }
 
-      if (block.type === "repeat") {
+      if (block.type === 'repeat') {
         state.repeatStack.push({
           count: Math.max(1, block.value || 1),
           current: 0,
@@ -247,39 +234,41 @@ export default function App() {
         continue;
       }
 
-      
-      if (block.type === "move") {
+      if (block.type === 'move') {
         await stepMove(spriteId, block.value || 0);
-      } else if (block.type === "turn") {
-        setSprites((prev) =>
-          prev.map((sp) =>
-            sp.id === spriteId ? { ...sp, rotation: sp.rotation + (block.value || 0) } : sp
-          )
-        );
-        await sleep(250);
-      } else if (block.type === "goto") {
+      } else if (block.type === 'turn') {
         setSprites((prev) =>
           prev.map((sp) =>
             sp.id === spriteId
-              ? { ...sp, position: { x: block.x ?? 0, y: block.y ?? 0 } }
+              ? { ...sp, rotation: sp.rotation + (block.value || 0) }
+              : sp
+          )
+        );
+        await sleep(250);
+      } else if (block.type === 'goto') {
+        setSprites((prev) =>
+          prev.map((sp) =>
+            sp.id === spriteId
+              ? { ...sp, position: { x: block.x || 0, y: block.y || 0 } }
               : sp
           )
         );
         await sleep(300);
-      } else if (block.type === "say" || block.type === "think") {
+      } else if (block.type === 'say' || block.type === 'think') {
         setSprites((prev) =>
           prev.map((sp) =>
-            sp.id === spriteId ? { ...sp, message: block.text || "" } : sp
+            sp.id === spriteId ? { ...sp, message: block.text || '' } : sp
           )
         );
 
         const duration = (block.duration || 1) * 1000;
         setTimeout(() => {
-          setSprites((p) => p.map((sp) => (sp.id === spriteId ? { ...sp, message: "" } : sp)));
+          setSprites((p) =>
+            p.map((sp) => (sp.id === spriteId ? { ...sp, message: '' } : sp))
+          );
         }, duration);
         await sleep(duration);
       } else {
-
         await sleep(150);
       }
 
@@ -287,8 +276,10 @@ export default function App() {
       currentState.blockIndex++;
 
       while (currentState.repeatStack.length > 0) {
-        const top = currentState.repeatStack[currentState.repeatStack.length - 1];
+        const top =
+          currentState.repeatStack[currentState.repeatStack.length - 1];
         top.current++;
+
         if (top.current < top.count) {
           currentState.blockIndex = top.startIndex + 1;
           break;
@@ -299,14 +290,18 @@ export default function App() {
     }
   };
 
- 
   return (
     <div className="h-screen bg-slate-950 flex flex-col overflow-hidden">
       <Header onPlay={executeActions} isPlaying={isPlaying} />
 
-      <div className="flex-1 flex overflow-hidden">
-        <BlockPalette onDragStart={handleDragStart} />
+      {/* MAIN RESPONSIVE LAYOUT */}
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+        {/* LEFT: Block Palette */}
+        <div className="w-full md:w-64 lg:w-80 shrink-0">
+          <BlockPalette onDragStart={handleDragStart} />
+        </div>
 
+        {/* CENTER: Canvas + SpriteList */}
         <main className="flex-1 flex flex-col">
           <Canvas
             sprites={sprites}
@@ -314,23 +309,28 @@ export default function App() {
             onSpriteClick={setSelectedSprite}
           />
 
-          <SpriteList
-            sprites={sprites}
-            selectedSprite={selectedSprite}
-            onSelectSprite={setSelectedSprite}
-            onAddSprite={addSprite}
-            onDeleteSprite={deleteSprite}
-            onDuplicateSprite={duplicateSprite}
-          />
+          <div className="h-48 sm:h-56 md:h-64">
+            <SpriteList
+              sprites={sprites}
+              selectedSprite={selectedSprite}
+              onSelectSprite={setSelectedSprite}
+              onAddSprite={addSprite}
+              onDeleteSprite={deleteSprite}
+              onDuplicateSprite={duplicateSprite}
+            />
+          </div>
         </main>
 
-        <ActionPanel
-          sprite={sprites.find((s) => s.id === selectedSprite)}
-          blocks={actionBlocks[selectedSprite] || []}
-          onDrop={handleDrop}
-          onUpdateBlock={updateBlock}
-          onRemoveBlock={removeBlock}
-        />
+        {/* RIGHT: Action Panel */}
+        <div className="w-full md:w-80 lg:w-96 shrink-0">
+          <ActionPanel
+            sprite={sprites.find((s) => s.id === selectedSprite)}
+            blocks={actionBlocks[selectedSprite] || []}
+            onDrop={handleDrop}
+            onUpdateBlock={updateBlock}
+            onRemoveBlock={removeBlock}
+          />
+        </div>
       </div>
     </div>
   );
