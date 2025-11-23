@@ -9,7 +9,7 @@ You can access the deployed version here:
 **https://scratch-starter-project-dusky.vercel.app/**
 
 
-## 📘 Overview
+## Overview
 The project recreates the basic building blocks of a Scratch-style editor inside a browser environment.  
 It includes:
 - A block palette with draggable actions  
@@ -19,7 +19,7 @@ It includes:
 
 This setup serves as a foundation for experimenting with UI logic, block behavior, event flow, and interactive interfaces.
 
-## 🎯 Key Features
+##  Key Features
 - Smooth drag-and-drop mechanics  
 - Organized action panel for dropped blocks  
 - Clear and minimal UI inspired by Scratch  
